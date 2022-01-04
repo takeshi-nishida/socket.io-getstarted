@@ -27,6 +27,9 @@
       const form = document.getElementById('form');
       const input = document.getElementById('input');
 
+      const name = window.prompt("名前を入力してください");
+      socket.emit('login', name);
+
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
@@ -35,9 +38,9 @@
         }
       });
 
-      socket.on('chat message', function(msg) {
+      socket.on('chat message', (data) => {
         const item = document.createElement('li');
-        item.textContent = msg;
+        item.textContent = "[" + data.name + "] " + data.msg;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
