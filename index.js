@@ -12,7 +12,9 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
 
-  socket.on('login', name => {
+  socket.on('login', (name) => {
+    io.emit('login', name);
+
     socket.on('chat message', (msg) => {
       io.emit('chat message', { name, msg });
     });

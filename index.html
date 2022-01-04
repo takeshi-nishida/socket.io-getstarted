@@ -38,12 +38,20 @@
         }
       });
 
+      socket.on('login', (name) => {
+        addMessage(name + " logged in.");
+      })
+
       socket.on('chat message', (data) => {
+        addMessage("[" + data.name + "] " + data.msg);
+      });
+
+      function addMessage(msg){
         const item = document.createElement('li');
-        item.textContent = "[" + data.name + "] " + data.msg;
+        item.textContent = msg;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-      });
+      }
     </script>
   </body>
 </html>
