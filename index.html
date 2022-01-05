@@ -13,6 +13,7 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+      #status { padding: 1rem; position: fixed; bottom: 3rem }
     </style>
   </head>
   <body>
@@ -20,12 +21,17 @@
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
+    <div id="status"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
 
       const form = document.getElementById('form');
       const input = document.getElementById('input');
+      const status = document.getElementById('status');
+
+      const typingUsers = new Map();
+      setInterval(updateStatus, 1000);
 
       const name = window.prompt("名前を入力してください");
       socket.emit('login', name);
@@ -51,6 +57,28 @@
         item.textContent = msg;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
+      }
+
+      input.addEventListener('input', (e) => {
+        socket.emit('typing');
+      });
+
+      socket.on('typing', (name) => {
+        typingUsers.set(name, new Date());
+        updateStatus();
+      })
+
+      function updateStatus(){
+        for(let [name, date] of typingUsers){
+          if(Date.now() - date > 3000){ typingUsers.delete(name); }
+        }
+
+        if(typingUsers.size > 0){
+          status.textContent = "typing: " + Array.from(typingUsers.keys()).join(", ");
+        }
+        else{
+          status.textContent = "";
+        }
       }
     </script>
   </body>
