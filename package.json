@@ -18,6 +18,7 @@
   "homepage": "https://github.com/takeshi-nishida/socket.io-getstarted#readme",
   "dependencies": {
     "express": "^4.17.2",
+    "mongoose": "^7.0.0",
     "socket.io": "^4.4.0"
   }
 }
