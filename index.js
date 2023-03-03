@@ -14,7 +14,7 @@ mongoose.connect(MONGODB_URL, { useNewUrlParser: true });
 // Database options
 const options = {
   timestamps: true, // add timestamp
-  toObject: { // change the way how data is converted to JavaScript object
+  toJSON: { // change the way how data is converted to JSON
     virtuals: true,
     versionKey: false,
     transform: (_, ret) => { delete ret._id; return ret; }
@@ -22,7 +22,7 @@ const options = {
 };
 
 // Define the shape of data (= schema) to be saved, and construct a model from the schema.
-const postSchema = new mongoose.Schema({ name: String, msg: String }, options);
+const postSchema = new mongoose.Schema({ name: String, msg: String, count: Number }, options);
 const Post = mongoose.model("Post", postSchema);
 
 app.get('/', (req, res) => {
@@ -42,8 +42,17 @@ io.on('connection', (socket) => {
 
     socket.on('chat message', async (msg) => {
       try {
-        const p = await Post.create({ name, msg }); // save data to database
+        const p = await Post.create({ name, msg, count: 0 }); // save data to database
         io.emit('chat message', p);          
+      } catch (e) { console.error(e); }
+    });
+
+    socket.on('fav', async id => {
+      const update = { $inc: { count: 1 }};
+      const options = { new: true };
+      try {
+        const p = await Post.findByIdAndUpdate(id, update, options);
+        io.emit('fav', p);
       } catch (e) { console.error(e); }
     });
 
