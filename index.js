@@ -1,9 +1,14 @@
 const express = require('express');
 const app = express();
+app.use(express.static('client/dist'));
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://127.0.0.1:5173"
+  }
+});
 
 const port = process.env.PORT;
 const MONGODB_URL = process.env.MONGODB_URL;
@@ -25,7 +30,7 @@ const options = {
 const postSchema = new mongoose.Schema({ name: String, msg: String, count: Number }, options);
 const Post = mongoose.model("Post", postSchema);
 
-app.get('/', (req, res) => {
+app.get('/plain', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
